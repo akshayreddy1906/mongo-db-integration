@@ -48,8 +48,6 @@ const newMovie = {
   trailerUrl: "https://example.com/salaar.mp4",
 };
 
-
-
 async function createMovie(newMovie) {
   try {
     const movie = new Movie(newMovie);
@@ -61,3 +59,25 @@ async function createMovie(newMovie) {
 }
 
 createMovie(newMovie);
+
+async function getMovies() {
+  try {
+    const movies = await Movie.find();
+    console.log("Movies:", movies);
+  } catch (error) {
+    console.error("Error fetching movies:", error);
+  }
+}
+
+getMovies();
+
+async function getMovieByDirectorName(directorName) {
+  try {
+    const movieByDirector = await Movie.find({ director: directorName });
+    console.log("Movie:", movieByDirector);
+  } catch (error) {
+    console.error("Error fetching movie:", error);
+  }
+}
+
+getMovieByDirectorName("S. S. Rajamouli");
