@@ -58,7 +58,7 @@ async function createMovie(newMovie) {
   }
 }
 
-createMovie(newMovie);
+// createMovie(newMovie);
 
 async function getMovies() {
   try {
@@ -68,8 +68,7 @@ async function getMovies() {
     console.error("Error fetching movies:", error);
   }
 }
-
-getMovies();
+// getMovies();
 
 async function getMovieByDirectorName(directorName) {
   try {
@@ -80,4 +79,32 @@ async function getMovieByDirectorName(directorName) {
   }
 }
 
-getMovieByDirectorName("S. S. Rajamouli");
+//getMovieByDirectorName("S. S. Rajamouli");
+
+async function updateMovie(movieId, updatedMovieData) {
+  try {
+    const updatedMovie = await Movie.findByIdAndUpdate(
+      movieId,
+      updatedMovieData,
+      { new: true }
+    );
+    console.log("Movie updated successfully:", updatedMovie);
+  } catch (error) {
+    console.error("Error updating movie:", error);
+  }
+}
+//updateMovie("67c873e9e53debb3749178e3", { rating: 8.5 });
+
+async function updateMovieDetails(movieTitle, updatedMovieData) {
+  try {
+    const updatedMovie = await Movie.findOneAndUpdate(
+      { title: movieTitle },
+      updatedMovieData,
+      { new: true }
+    );
+    console.log("Movie updated successfully:", updatedMovie);
+  } catch (error) {
+    console.error("Error updating movie:", error);
+  }
+}
+updateMovieDetails("Salaar", { rating: 9.5 });
