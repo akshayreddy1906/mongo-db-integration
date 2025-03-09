@@ -107,4 +107,25 @@ async function updateMovieDetails(movieTitle, updatedMovieData) {
     console.error("Error updating movie:", error);
   }
 }
-updateMovieDetails("Salaar", { rating: 9.5 });
+///updateMovieDetails("Salaar", { rating: 9.5 });
+
+async function deleteMovieById(movieId) {
+  try {
+    const deletedMovie = await Movie.findByIdAndDelete(movieId);
+    console.log("Movie deleted successfully:", deletedMovie);
+  } catch (error) {
+    console.error("Error deleting movie:", error);
+  }
+}
+//deleteMovieById("67c873e9e53debb3749178e3");
+
+
+async function deleteMovieByTitle(movieTitle) {
+  try {
+    const deletedMovie = await Movie.findOneAndDelete({ title: movieTitle });
+    console.log("Movie deleted successfully:", deletedMovie);
+  } catch (error) {
+    console.error("Error deleting movie:", error);
+  }
+}
+deleteMovieByTitle("Salaar");
