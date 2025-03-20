@@ -1,7 +1,12 @@
+const express = require("express");
+const app = express();
+
 const { initializeDatabase } = require("./db/db.connect");
 // const fs = require("fs");
 const Movie = require("./models/movie.models");
+const { get } = require("mongoose");
 
+app.use(express.json());
 initializeDatabase();
 
 // const jsonData = fs.readFileSync("movies.json");
@@ -58,22 +63,40 @@ async function createMovie(newMovie) {
   }
 }
 
-// createMovie(newMovie);
+app.post("/movies", async (req, res) => {
+  try {
+    const savedMovie = await createMovie(req.body);
+    res
+      .status(201)
+      .json({ message: "Movie added successfully", movie: savedMovie });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to add movie", error: error });
+  }
+});
 
+app.get("/movies", async (req, res) => {
+  try {
+    const allMovies = await getMovies();
+    res
+      .status(200)
+      .json({ message: "Movies fetched successfully.", movies: allMovies });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch movies", error: error });
+  }
+});
 async function getMovies() {
   try {
     const movies = await Movie.find();
-    console.log("Movies:", movies);
+    return movies;
   } catch (error) {
     console.error("Error fetching movies:", error);
   }
 }
-// getMovies();
 
 async function getMovieByDirectorName(directorName) {
   try {
     const movieByDirector = await Movie.find({ director: directorName });
-    console.log("Movie:", movieByDirector);
+    return movieByDirector;
   } catch (error) {
     console.error("Error fetching movie:", error);
   }
@@ -81,6 +104,16 @@ async function getMovieByDirectorName(directorName) {
 
 //getMovieByDirectorName("S. S. Rajamouli");
 
+app.get("/movies/:directorName", async (req, res) => {
+  try {
+    const movieByDirector = await getMovieByDirectorName(req.params.directorName);
+    res
+      .status(200)
+      .json({ message: "Movies fetched successfully.", movies: movieByDirector });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch movies", error: error });
+  }
+});
 async function updateMovie(movieId, updatedMovieData) {
   try {
     const updatedMovie = await Movie.findByIdAndUpdate(
@@ -88,13 +121,23 @@ async function updateMovie(movieId, updatedMovieData) {
       updatedMovieData,
       { new: true }
     );
-    console.log("Movie updated successfully:", updatedMovie);
+    return updatedMovie;
   } catch (error) {
     console.error("Error updating movie:", error);
   }
 }
 //updateMovie("67c873e9e53debb3749178e3", { rating: 8.5 });
 
+app.post("/movies/:movieId/update", async (req, res) => {
+  try {
+    const updatedMovie = await updateMovie(req.params.movieId, req.body);
+    res
+      .status(200)
+      .json({ message: "Movie updated successfully.", movie: updatedMovie });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to update movie", error: error });
+  }
+});
 async function updateMovieDetails(movieTitle, updatedMovieData) {
   try {
     const updatedMovie = await Movie.findOneAndUpdate(
@@ -112,13 +155,23 @@ async function updateMovieDetails(movieTitle, updatedMovieData) {
 async function deleteMovieById(movieId) {
   try {
     const deletedMovie = await Movie.findByIdAndDelete(movieId);
-    console.log("Movie deleted successfully:", deletedMovie);
+    return deletedMovie;
   } catch (error) {
     console.error("Error deleting movie:", error);
   }
 }
 //deleteMovieById("67c873e9e53debb3749178e3");
-
+app.delete("/movies/:movieId/delete", async (req, res) => {
+  query = req.params.movieId;
+  try {
+    const deletedMovie = await deleteMovieById(query);
+    res
+      .status(200)
+      .json({ message: "Movie deleted successfully.", movie: deletedMovie });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to delete movie", error: error });
+  }
+});
 
 async function deleteMovieByTitle(movieTitle) {
   try {
@@ -128,4 +181,9 @@ async function deleteMovieByTitle(movieTitle) {
     console.error("Error deleting movie:", error);
   }
 }
-deleteMovieByTitle("Salaar");
+//deleteMovieByTitle("Salaar");
+
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
